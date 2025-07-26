@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { FaUser, FaEnvelope, FaLock, FaHeartbeat } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-
+import { easeOut, easeIn } from 'framer-motion';
 export default function PatientAuthPage() {
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
@@ -42,7 +42,7 @@ export default function PatientAuthPage() {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut"
+        ease: easeOut
       }
     },
     exit: { 
@@ -50,7 +50,7 @@ export default function PatientAuthPage() {
       y: -20,
       transition: {
         duration: 0.4,
-        ease: "easeIn"
+        ease: easeIn
       }
     }
   };
@@ -73,7 +73,7 @@ export default function PatientAuthPage() {
       y: 0,
       transition: {
         duration: 0.5,
-        ease: "easeOut"
+        ease: easeOut
       }
     }
   };

@@ -71,7 +71,7 @@ export default function HospitalRegistrationPortal() {
               <div className="space-y-8">
                 <div>
                   <h1 className="text-3xl font-bold mb-2 text-[#E02476]">Hospital Registration</h1>
-                  <p className="text-gray-800   ">Please provide your facility's basic information</p>
+                  <p className="text-gray-800">Please provide your facility&#39;s basic information</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -356,7 +356,7 @@ export default function HospitalRegistrationPortal() {
                       />
                       <div className="ml-4">
                         <h3 className="font-medium text-gray-100">Government Database Verification</h3>
-                        <p className="text-sm text-gray-400 mt-1">We'll verify your facility through official government healthcare registries</p>
+                        <p className="text-sm text-gray-400 mt-1">We&#39;ll verify your facility through official government healthcare registries</p>
                       </div>
                     </label>
                   </motion.div>
@@ -376,7 +376,7 @@ export default function HospitalRegistrationPortal() {
                       />
                       <div className="ml-4">
                         <h3 className="font-medium text-gray-100">Phone Verification</h3>
-                        <p className="text-sm text-gray-400 mt-1">We'll call your official hospital number to verify your identity</p>
+                        <p className="text-sm text-gray-400 mt-1">We&#39;ll call your official hospital number to verify your identity</p>
                       </div>
                     </label>
                   </motion.div>
