@@ -4,7 +4,31 @@
   --background: #ffffff;
   --foreground: #171717;
 }
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
 
+@keyframes float-delay {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(15px);
+  }
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: float-delay 10s ease-in-out infinite;
+}
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
