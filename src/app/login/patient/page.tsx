@@ -23,12 +23,33 @@ export default function PatientAuthPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      console.log(isLogin ? 'Logging in...' : 'Registering...', form);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // On successful auth, navigate to dashboard with animation
+      const endpoint = isLogin
+        ? 'http://localhost:8000/api/patient/login/'
+        : 'http://localhost:8000/api/patient/register/';
+      const payload = isLogin
+        ? { email: form.email, password: form.password }
+        : { username: form.name, email: form.email, password: form.password };
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.message || 'An error occurred.');
+        return;
+      }
+
+      const result = await res.json();
+      localStorage.setItem('user', JSON.stringify(result.user)); // store name & email
       router.push('/dashboard');
+
+    } catch (err) {
+      alert('Network error. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
