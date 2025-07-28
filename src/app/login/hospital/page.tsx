@@ -33,10 +33,47 @@ export default function HospitalRegistrationPortal() {
   const nextStep = () => setStep(prev => prev + 1);
   const prevStep = () => setStep(prev => prev - 1);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', form);
-    // API call would go here
+    setIsSubmitting(true);
+    try {
+      // Replace with your actual backend endpoint for hospital/admin registration
+      const endpoint = 'http://localhost:8000/api/hospital/register/';
+      const payload = { ...form };
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      let result;
+      try {
+        result = await res.json();
+      } catch (jsonErr) {
+        console.error('Failed to parse JSON:', jsonErr);
+        alert('Invalid response from server.');
+        return;
+      }
+
+      if (!res.ok) {
+        console.error('API error:', result);
+        alert(result.message || 'An error occurred.');
+        return;
+      }
+
+      // Registration success logic (customize as needed)
+      alert('Registration successful!');
+      // Optionally redirect or clear form
+    } catch (err) {
+      console.error('Network or unexpected error:', err);
+      alert('Network error. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

@@ -1,15 +1,14 @@
-'use client';
+"use client";
 
 import { useState } from 'react';
-import { FaUser, FaEnvelope, FaLock, FaHeartbeat } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaHeartbeat } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { easeOut, easeIn } from 'framer-motion';
-export default function PatientAuthPage() {
+
+export default function PatientLoginPage() {
   const router = useRouter();
-  const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({
-    name: '',
     email: '',
     password: '',
   });
@@ -23,13 +22,8 @@ export default function PatientAuthPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const endpoint = isLogin
-        ? 'http://localhost:8000/api/patient/login/'
-        : 'http://localhost:8000/api/patient/register/';
-      const payload = isLogin
-        ? { email: form.email, password: form.password }
-        : { username: form.name, email: form.email, password: form.password };
-
+      const endpoint = 'http://localhost:8000/api/patient/login/';
+      const payload = { email: form.email, password: form.password };
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -37,95 +31,35 @@ export default function PatientAuthPage() {
         },
         body: JSON.stringify(payload),
       });
-
-      let result;
-      try {
-        result = await res.json();
-      } catch (jsonErr) {
-        console.error('Failed to parse JSON:', jsonErr);
-        alert('Invalid response from server.');
-        return;
-      }
-
       if (!res.ok) {
-        console.error('API error:', result);
-        if (isLogin && result.message && result.message.toLowerCase().includes('invalid credentials')) {
-          alert('No account found for this email. Please register first.');
-        } else {
-          alert(result.message || 'An error occurred.');
-        }
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.message || 'An error occurred.');
         return;
       }
-
-      if (isLogin) {
-        if (!result.token || !result.role) {
-          console.error('Missing token or role in response:', result);
-          alert('Login failed: missing token or role.');
-          return;
-        }
-        localStorage.setItem('token', result.token);
-        localStorage.setItem('role', result.role);
-        router.push(`/dashboard/${result.role}`);
-      } else {
-        if (!result.user) {
-          console.error('Missing user in registration response:', result);
-          alert('Registration failed: missing user info.');
-          return;
-        }
-        localStorage.setItem('user', JSON.stringify(result.user));
-        router.push('/dashboard');
-      }
-
+      const result = await res.json();
+      localStorage.setItem('patient', JSON.stringify(result.user));
+      router.push('/dashboard');
     } catch (err) {
-      console.error('Network or unexpected error:', err);
       alert('Network error. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: easeOut
-      }
-    },
-    exit: { 
-      opacity: 0, 
-      y: -20,
-      transition: {
-        duration: 0.4,
-        ease: easeIn
-      }
-    }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easeOut } },
+    exit: { opacity: 0, y: -20, transition: { duration: 0.4, ease: easeIn } }
   };
 
   const formVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
+    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } }
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 10 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: easeOut
-      }
-    }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: easeOut } }
   };
 
   return (
@@ -136,7 +70,6 @@ export default function PatientAuthPage() {
         exit="exit"
         className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 to-blue-50 px-4 relative overflow-hidden"
       >
-        {/* Background elements with animation */}
         <motion.div 
           className="absolute inset-0 overflow-hidden"
           initial={{ opacity: 0 }}
@@ -145,29 +78,15 @@ export default function PatientAuthPage() {
         >
           <motion.div 
             className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-teal-100 blur-3xl"
-            animate={{
-              y: [0, -20, 0],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
+            animate={{ y: [0, -20, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div 
             className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-blue-100 blur-3xl"
-            animate={{
-              y: [0, 15, 0],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1
-            }}
+            animate={{ y: [0, 15, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
           />
         </motion.div>
-        
         <motion.div 
           className="relative z-10 bg-white/90 backdrop-blur-sm border border-white/20 shadow-lg rounded-xl p-8 sm:p-10 w-full max-w-md"
           variants={containerVariants}
@@ -182,21 +101,15 @@ export default function PatientAuthPage() {
               <FaHeartbeat className="text-3xl text-white" />
             </div>
           </motion.div>
-          
           <motion.div 
             className="text-center mb-8"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">
-              {isLogin ? 'Welcome Back' : 'Join Our Care Network'}
-            </h2>
-            <p className="text-gray-600">
-              {isLogin ? 'Access your health records and appointments' : 'Create your account to manage your healthcare'}
-            </p>
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">Patient Login</h2>
+            <p className="text-gray-600">Sign in to manage your patient account</p>
           </motion.div>
-
           <motion.form 
             onSubmit={handleSubmit} 
             className="space-y-5"
@@ -204,26 +117,6 @@ export default function PatientAuthPage() {
             initial="hidden"
             animate="visible"
           >
-            {!isLogin && (
-              <motion.div className="group" variants={itemVariants}>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 group-focus-within:text-teal-500 transition-colors">
-                    <FaUser />
-                  </div>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="John Doe"
-                    value={form.name}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 placeholder-gray-400 text-gray-800 focus:ring-2 focus:ring-teal-400 focus:border-transparent outline-none transition-all group-hover:border-gray-300 bg-white/80"
-                    required
-                  />
-                </div>
-              </motion.div>
-            )}
-
             <motion.div className="group" variants={itemVariants}>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
               <div className="relative">
@@ -241,7 +134,6 @@ export default function PatientAuthPage() {
                 />
               </div>
             </motion.div>
-
             <motion.div className="group" variants={itemVariants}>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
               <div className="relative">
@@ -259,31 +151,6 @@ export default function PatientAuthPage() {
                 />
               </div>
             </motion.div>
-
-            {isLogin && (
-              <motion.div 
-                className="flex items-center justify-between"
-                variants={itemVariants}
-              >
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-teal-500 focus:ring-teal-400"
-                  />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                    Remember me
-                  </label>
-                </div>
-                <div className="text-sm">
-                  <a href="#" className="font-medium text-teal-600 hover:text-teal-500">
-                    Forgot password?
-                  </a>
-                </div>
-              </motion.div>
-            )}
-
             <motion.button
               type="submit"
               disabled={isSubmitting}
@@ -305,37 +172,10 @@ export default function PatientAuthPage() {
                   Processing...
                 </>
               ) : (
-                isLogin ? 'Sign In' : 'Create Account'
+                'Sign In'
               )}
             </motion.button>
           </motion.form>
-
-          <motion.div 
-            className="mt-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-          >
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  {isLogin ? "Don't have an account?" : 'Already registered?'}
-                </span>
-              </div>
-            </div>
-
-            <motion.button
-              onClick={() => setIsLogin(!isLogin)}
-              className="mt-4 w-full py-2.5 px-4 rounded-lg font-medium transition-all border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-            >
-              {isLogin ? 'Create New Account' : 'Sign In Instead'}
-            </motion.button>
-          </motion.div>
         </motion.div>
       </motion.main>
     </AnimatePresence>
